@@ -1,26 +1,46 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import ProviderCard from "./components/ProviderCard";
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      FirstName: "",
+      LastName: "",
+      Bio: "",
+      PhotoURL: "",
+      ID: 0,
+      Specialty: ""
+    };
+  }
+
+  componentDidMount() {
+    fetch(
+      "https://provider.stvincent.org/API/fullAPI?mode=ProviderDetails&providerID=185&dataFormat=json"
+    )
+      .then(response => response.json())
+      .then(data => {
+        let providerData = data.ProviderInformation.Provider;
+        this.setState({
+          FirstName: providerData.FirstName,
+          LastName: providerData.LastName,
+          Bio: providerData.Bio,
+          PhotoURL: providerData.PhotoURL,
+          ID: providerData.ID,
+          Specialty: providerData.Specialty[0].Name
+        });
+      });
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <ProviderCard
+        Name={this.state.FirstName + " " + this.state.LastName}
+        Bio={this.state.Bio}
+        PhotoURL={this.state.PhotoURL}
+        ID={this.state.ID}
+        Specialty={this.state.Specialty}
+      />
     );
   }
 }
