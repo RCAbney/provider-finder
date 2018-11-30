@@ -1,33 +1,45 @@
 import React from "react";
 
-function ProviderCard({ PhotoURL, Name, ID, Specialty, Bio }) {
-  let url = `https://provider.stvincent.org/All/details/`;
+function ProviderCard({ photoURL, name, id, specialty, bio }) {
+  let url = `https://provider.stvincent.org/details/`;
   function bioText() {
-    return { __html: Bio };
+    return { __html: bio };
   }
 
   return (
-    <div className="container">
-      <div className="row">
-        <div className="col-sm-7">
-          <div className="row">
-            <div className="col-sm-3">
-              <img
-                src={PhotoURL}
-                alt={Name}
-                className="photo img-responsive img-thumbnail center-block"
-              />
-            </div>
-            <div className="col-sm-9">
-              <a href={url + ID} target="_blank" className="providerLink">
-                <h3 className="providerName">{Name}</h3>
-              </a>
-              <hr />
-              <h3 className="service-line">{Specialty}</h3>
-              <p className="bio" dangerouslySetInnerHTML={bioText()} />
+    <div className="row provider justify-content-sm-center">
+      <div className="col-sm-8">
+        <div className="card">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-sm-3">
+                <img
+                  src={photoURL ? photoURL : `https://placehold.it/125x145`}
+                  alt={name}
+                  className="photo img-responsive img-thumbnail center-block"
+                />
+              </div>
+              <div className="col-sm-9">
+                <a
+                  href={url + id}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="providerLink"
+                >
+                  <h3 className="providerName">{name}</h3>
+                </a>
+                <hr />
+                <p>
+                  <strong>{specialty}</strong>
+                </p>
+                <hr />
+                <p className="bio" dangerouslySetInnerHTML={bioText()} />
+                <a href={url + id} className="btn btn-primary">
+                  View Full Profile
+                </a>
+              </div>
             </div>
           </div>
-          <hr />
         </div>
       </div>
     </div>

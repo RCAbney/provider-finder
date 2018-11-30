@@ -1,46 +1,66 @@
 import React, { Component } from "react";
 import ProviderCard from "./components/ProviderCard";
+import './App.css';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      FirstName: "",
-      LastName: "",
-      Bio: "",
-      PhotoURL: "",
-      ID: 0,
-      Specialty: ""
+      providers: []
     };
   }
 
   componentDidMount() {
-    fetch(
-      "https://provider.stvincent.org/API/fullAPI?mode=ProviderDetails&providerID=185&dataFormat=json"
-    )
-      .then(response => response.json())
+    let reqUrl =
+      "https://provider.stvincent.org/API/fullAPI?mode=ProviderResults&OrgUnits=20&sortDirection=Asc&dataFormat=json";
+
+    const request = url => {
+      return fetch(url).then(response => response.json());
+    };
+
+    request(reqUrl)
       .then(data => {
-        let providerData = data.ProviderInformation.Provider;
-        this.setState({
-          FirstName: providerData.FirstName,
-          LastName: providerData.LastName,
-          Bio: providerData.Bio,
-          PhotoURL: providerData.PhotoURL,
-          ID: providerData.ID,
-          Specialty: providerData.Specialty[0].Name
+        const {
+          ProviderInformation: { Provider }
+        } = data;
+        const ids = Provider.map(provider => provider.ID);
+        return ids;
+      })
+      .then(ids => {
+        let individualDocs = [];
+        ids.map(id =>
+          individualDocs.push(
+            `https://provider.stvincent.org/API/fullAPI?mode=ProviderDetails&providerID=${id}&dataFormat=json`
+          )
+        );
+        let promises = individualDocs.map(url =>
+          fetch(url).then(response => response.json())
+        );
+        Promise.all(promises).then(results => {
+          this.setState({
+            providers: results
+          });
         });
       });
   }
 
   render() {
     return (
-      <ProviderCard
-        Name={this.state.FirstName + " " + this.state.LastName}
-        Bio={this.state.Bio}
-        PhotoURL={this.state.PhotoURL}
-        ID={this.state.ID}
-        Specialty={this.state.Specialty}
-      />
+      <div className="container">
+        {this.state.providers.map(function(provider, index) {
+          let info = provider.ProviderInformation.Provider;
+          return (
+            <ProviderCard
+              key={index}
+              bio={info.Bio}
+              name={info.FirstName + " " + info.LastName}
+              id={info.ID}
+              photoURL={info.PhotoURL}
+              specialty={info.Specialty[0].Name}
+            />
+          );
+        })}
+      </div>
     );
   }
 }
